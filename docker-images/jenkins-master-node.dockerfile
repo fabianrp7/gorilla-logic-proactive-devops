@@ -1,0 +1,60 @@
+FROM jenkins/jenkins:lts
+
+ARG HOST_UID=1004
+ARG HOST_GID=999
+USER root
+
+#COPY ssh_config /etc/ssh/
+
+#Essentials Plugins
+RUN /usr/local/bin/install-plugins.sh codedeploy
+RUN /usr/local/bin/install-plugins.sh blueocean
+RUN /usr/local/bin/install-plugins.sh maven-plugin
+RUN /usr/local/bin/install-plugins.sh build-pipeline-plugin
+RUN /usr/local/bin/install-plugins.sh dashboard-view
+RUN /usr/local/bin/install-plugins.sh workflow-multibranch
+RUN /usr/local/bin/install-plugins.sh git
+RUN /usr/local/bin/install-plugins.sh job-dsl
+RUN /usr/local/bin/install-plugins.sh workflow-aggregator
+RUN /usr/local/bin/install-plugins.sh generic-webhook-trigger
+RUN /usr/local/bin/install-plugins.sh workflow-cps-global-lib
+RUN /usr/local/bin/install-plugins.sh workflow-cps
+RUN /usr/local/bin/install-plugins.sh ws-cleanup
+RUN /usr/local/bin/install-plugins.sh remote-file
+RUN /usr/local/bin/install-plugins.sh kiuwanJenkinsPlugin
+RUN /usr/local/bin/install-plugins.sh sonar
+
+# Plugins for better UX (not mandatory)
+RUN /usr/local/bin/install-plugins.sh ansicolor
+RUN /usr/local/bin/install-plugins.sh greenballs
+
+# Plugin for scaling Jenkins agents
+RUN /usr/local/bin/install-plugins.sh kubernetes
+
+
+#nodejs and tools
+RUN apt update -y
+RUN apt-get install curl -y
+RUN apt install zip -y
+RUN apt install unzip -y
+RUN apt install tar -y
+RUN curl -sL https://deb.nodesource.com/setup_14.x | bash -
+RUN apt-get install -y nodejs
+
+#kubernetes
+RUN  apt-get update &&  apt-get install -y apt-transport-https gnupg2 curl
+RUN  curl -s https://packages.cloud.google.com/apt/doc/apt-key.gpg |  apt-key add -
+RUN  echo "deb https://apt.kubernetes.io/ kubernetes-xenial main" |  tee -a /etc/apt/sources.list.d/kubernetes.list
+RUN  apt-get update
+RUN  apt-get install -y kubectl
+RUN mkdir /root/.kube
+# COPY config /root/.kube/
+COPY .npmrc /root/ 
+
+#install gcp
+RUN echo "deb [signed-by=/usr/share/keyrings/cloud.google.gpg] https://packages.cloud.google.com/apt cloud-sdk main" | tee -a /etc/apt/sources.list.d/google-cloud-sdk.list
+RUN apt-get install apt-transport-https ca-certificates gnupg
+RUN curl https://packages.cloud.google.com/apt/doc/apt-key.gpg | apt-key --keyring /usr/share/keyrings/cloud.google.gpg add -
+RUN apt-get update && apt-get install google-cloud-sdk
+
+#USER jenkins

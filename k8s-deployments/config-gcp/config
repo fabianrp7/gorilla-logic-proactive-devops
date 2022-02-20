@@ -1,0 +1,20 @@
+apiVersion: v1
+clusters:
+- cluster:
+    certificate-authority: fake-ca-file
+    server: https://34.72.172.36
+  name: gke_gorilla-logic-devops_us-central1-c_cluster-gorilla-logic
+contexts:
+- context:
+    cluster: gke_gorilla-logic-devops_us-central1-c_cluster-gorilla-logic
+    namespace: gorilla-logic
+    user: gcp
+  name: gke_gorilla-logic-devops_us-central1-c_cluster-gorilla-logic
+current-context: ""
+kind: Config
+preferences: {}
+users:
+- name: gcp
+  user:
+    client-certificate: fake-cert-file
+    client-key: fake-key-seefile
